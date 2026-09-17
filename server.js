@@ -12,6 +12,7 @@ require("dotenv").config();
 const app = express();
 
 const allowedOrigins = [ 
+  "https://book.brisbanerideexplore.com",
   "https://booking-frontend-samad22.vercel.app", 
   "https://booking-frontend-git-main-samad22.vercel.app", 
   "http://localhost:5173" 
