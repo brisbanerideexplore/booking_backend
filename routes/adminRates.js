@@ -12,11 +12,16 @@ router.get("/", async (req, res) => {
 
 router.post("/", async (req, res) => {
   try {
-    const { vehicle, tagline, baseFare, perKm, perMin, minFare } = req.body;
+    const { vehicle, tagline, baseFare, perKm, tierThresholdKm, perKmAfterThreshold, perMin, minFare } = req.body;
     if (!vehicle || baseFare == null || perKm == null || perMin == null) {
       return res.status(400).json({ error: "Missing required fields." });
     }
-    const rate = await Rate.create({ vehicle, tagline, baseFare, perKm, perMin, minFare: minFare || 0 });
+    const rate = await Rate.create({
+      vehicle, tagline, baseFare, perKm,
+      tierThresholdKm: tierThresholdKm || 0,
+      perKmAfterThreshold: perKmAfterThreshold || 0,
+      perMin, minFare: minFare || 0
+    });
     res.status(201).json(rate);
   } catch (err) {
     if (err.code === 11000) return res.status(400).json({ error: "That vehicle already exists." });
@@ -27,10 +32,10 @@ router.post("/", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
   try {
-    const { tagline, baseFare, perKm, perMin, minFare } = req.body;
+    const { tagline, baseFare, perKm, tierThresholdKm, perKmAfterThreshold, perMin, minFare } = req.body;
     const rate = await Rate.findByIdAndUpdate(
       req.params.id,
-      { tagline, baseFare, perKm, perMin, minFare },
+      { tagline, baseFare, perKm, tierThresholdKm: tierThresholdKm || 0, perKmAfterThreshold: perKmAfterThreshold || 0, perMin, minFare },
       { new: true, runValidators: true }
     );
     if (!rate) return res.status(404).json({ error: "Vehicle not found." });

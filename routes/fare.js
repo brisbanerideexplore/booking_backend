@@ -20,7 +20,16 @@ router.post("/calculate-fare", async (req, res) => {
       originLat, originLng, destLat, destLng
     );
 
-    let fare = rate.baseFare + (distanceKm * rate.perKm) + (durationMin * rate.perMin);
+    let distanceCost;
+    if (rate.tierThresholdKm && distanceKm > rate.tierThresholdKm) {
+      const tierKm = rate.tierThresholdKm;
+      const remainingKm = distanceKm - tierKm;
+      distanceCost = (tierKm * rate.perKm) + (remainingKm * rate.perKmAfterThreshold);
+    } else {
+      distanceCost = distanceKm * rate.perKm;
+    }
+
+    let fare = rate.baseFare + distanceCost + (durationMin * rate.perMin);
     if (rate.minFare && fare < rate.minFare) {
       fare = rate.minFare;
     }
