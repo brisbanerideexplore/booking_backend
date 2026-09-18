@@ -9,19 +9,23 @@ const transporter = nodemailer.createTransport({
 });
 
 function formatBookingDetails(booking) {
+  const isCash = booking.paymentMethod === "cash";
+  const fareLabel = isCash ? "Fare due (pay driver in cash)" : "Fare paid";
+
   return `
     <table style="width:100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px;">
       <tr><td style="padding:6px 0; color:#666;">Pickup</td><td style="padding:6px 0;"><strong>${booking.pickupAddress}</strong></td></tr>
       <tr><td style="padding:6px 0; color:#666;">Destination</td><td style="padding:6px 0;"><strong>${booking.destinationAddress}</strong></td></tr>
       <tr><td style="padding:6px 0; color:#666;">Passengers</td><td style="padding:6px 0;"><strong>${booking.passengers}</strong></td></tr>
       <tr><td style="padding:6px 0; color:#666;">Luggage</td><td style="padding:6px 0;"><strong>${booking.luggage}</strong></td></tr>
-<tr><td style="padding:6px 0; color:#666;">Pickup date</td><td style="padding:6px 0;"><strong>${booking.pickupDate}</strong></td></tr>
-<tr><td style="padding:6px 0; color:#666;">Pickup time</td><td style="padding:6px 0;"><strong>${booking.pickupTime}</strong></td></tr>
+      <tr><td style="padding:6px 0; color:#666;">Pickup date</td><td style="padding:6px 0;"><strong>${booking.pickupDate}</strong></td></tr>
+      <tr><td style="padding:6px 0; color:#666;">Pickup time</td><td style="padding:6px 0;"><strong>${booking.pickupTime}</strong></td></tr>
       <tr><td style="padding:6px 0; color:#666;">Vehicle</td><td style="padding:6px 0;"><strong>${booking.vehicle}</strong></td></tr>
       <tr><td style="padding:6px 0; color:#666;">Distance</td><td style="padding:6px 0;"><strong>${booking.distanceKm} km</strong></td></tr>
       <tr><td style="padding:6px 0; color:#666;">Drive time</td><td style="padding:6px 0;"><strong>${Math.round(booking.durationMin)} min</strong></td></tr>
       ${booking.childSeat ? `<tr><td style="padding:6px 0; color:#666;">Child seat</td><td style="padding:6px 0;"><strong>Yes (+$${booking.childSeatFee.toFixed(2)})</strong></td></tr>` : ""}
-      <tr><td style="padding:6px 0; color:#666;">Fare paid</td><td style="padding:6px 0;"><strong>$${booking.fare.toFixed(2)}</strong></td></tr>
+      <tr><td style="padding:6px 0; color:#666;">Payment method</td><td style="padding:6px 0;"><strong>${isCash ? "Cash (pay driver)" : "Card (paid online)"}</strong></td></tr>
+      <tr><td style="padding:6px 0; color:#666;">${fareLabel}</td><td style="padding:6px 0;"><strong>$${booking.fare.toFixed(2)}</strong></td></tr>
       <tr><td style="padding:6px 0; color:#666;">Booking ref</td><td style="padding:6px 0;"><strong>${booking.stripeSessionId}</strong></td></tr>
     </table>
   `;

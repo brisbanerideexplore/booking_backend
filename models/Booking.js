@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const bookingSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true },
-  phone: { type: String, required: true }, // full number incl. country code, e.g. +61412345678
+  phone: { type: String, required: true },
 
   pickupAddress: { type: String, required: true },
   pickupLat: { type: Number, required: true },
@@ -27,6 +27,7 @@ const bookingSchema = new mongoose.Schema({
   childSeat: { type: Boolean, default: false },
   childSeatFee: { type: Number, default: 0 },
 
+  paymentMethod: { type: String, enum: ["card", "cash"], default: "card" },
   stripeSessionId: { type: String, required: true, unique: true },
   stripePaymentIntentId: { type: String },
   paymentStatus: {

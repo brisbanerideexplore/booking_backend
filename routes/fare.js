@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Rate = require("../models/Rate");
 const { getDrivingDistanceAndTime } = require("../utils/mapbox");
+const { calculateFare } = require("../utils/fareCalculator");
 
 router.post("/calculate-fare", async (req, res) => {
   try {
@@ -20,31 +21,8 @@ router.post("/calculate-fare", async (req, res) => {
       originLat, originLng, destLat, destLng
     );
 
-    let distanceCost;
-    if (rate.tierThresholdKm && distanceKm > rate.tierThresholdKm) {
-      const tierKm = rate.tierThresholdKm;
-      const remainingKm = distanceKm - tierKm;
-      distanceCost = (tierKm * rate.perKm) + (remainingKm * rate.perKmAfterThreshold);
-    } else {
-      distanceCost = distanceKm * rate.perKm;
-    }
-
-    let fare = rate.baseFare + distanceCost + (durationMin * rate.perMin);
-    if (rate.minFare && fare < rate.minFare) {
-      fare = rate.minFare;
-    }
-
-    const CHILD_SEAT_FEE = 25;
-    const childSeatFee = childSeat ? CHILD_SEAT_FEE : 0;
-    fare += childSeatFee;
-
-    res.json({
-      distanceKm: Number(distanceKm.toFixed(2)),
-      durationMin: Number(durationMin.toFixed(1)),
-      childSeat: !!childSeat,
-      childSeatFee,
-      fare: Number(fare.toFixed(2))
-    });
+    const result = calculateFare(rate, distanceKm, durationMin, childSeat);
+    res.json(result);
 
   } catch (err) {
     console.error(err);
