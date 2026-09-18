@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 const connectDB = require("./utils/db");
+const Rate = require("./models/Rate");
 
 const app = express();
 
@@ -28,6 +29,19 @@ app.use(async (req, res, next) => {
     res.status(500).json({ error: "Database connection failed. Please try again." });
   }
 });
+
+app.use('/',async(req,res)=>{
+  try {
+    
+    const rate=await Rate.find();
+    res.status(201).json(rate);
+    console.log(rate);
+    
+  } catch (error) {
+    console.log(error);
+    
+  }
+})
 
 // 1. Webhook FIRST, with express.raw (not express.json)
 app.use("/webhook", require("./routes/stripeWebhook"));
